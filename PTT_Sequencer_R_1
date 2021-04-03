@@ -1,0 +1,98 @@
+/*
+ * Version R 1.0
+ * Simple but efficient circuit to protect radio accessories from "hot switch".
+ * Description of the circuit here:
+ * https://yo3hjv.blogspot.com/2021/04/arduino-ptt-sequencer-for-xiegu-g90.html
+ * Copyright 2021, april.
+ * Adrian Florescu, YO3HJV
+ */
+
+const byte PtoRadio = 5;
+const byte BUTTON = 2;
+const byte bit1 = 10;
+const byte bit2 = 11;
+const byte red = 9;
+const byte green = 8;
+
+#define QRO_A A5
+#define QRO_B A0
+
+int interval = 200;  // msec
+byte PTT = 0;
+
+
+void setup ()
+{         pinMode(red, OUTPUT);
+          pinMode(green, OUTPUT);
+          pinMode(bit1, INPUT_PULLUP);
+          pinMode(bit2, INPUT_PULLUP);
+          pinMode(PtoRadio, OUTPUT);
+          pinMode(QRO_A, OUTPUT);
+          pinMode(QRO_B, OUTPUT);
+          pinMode(BUTTON, INPUT_PULLUP);
+          pinMode(BUTTON, INPUT_PULLUP);
+          pinMode(BUTTON, INPUT_PULLUP);
+       check_timing();
+          digitalWrite(PtoRadio, LOW);
+          digitalWrite(QRO_B, LOW);
+          digitalWrite(QRO_A, LOW);
+          digitalWrite(green, LOW);
+          digitalWrite(red, LOW);
+       attachInterrupt (digitalPinToInterrupt (BUTTON), switchPressed, CHANGE);  // attach interrupt handler
+          digitalWrite(red, HIGH);
+          delay(300);
+          digitalWrite(red, LOW);
+          delay(200);
+          digitalWrite(green, HIGH);
+          
+}  
+void check_timing(){
+
+               if ((digitalRead (bit1) == LOW) && (digitalRead (bit2) == LOW))   { interval = 25;}
+          else if ((digitalRead (bit1) == HIGH) && (digitalRead (bit2) == LOW))  { interval = 50;}
+          else if ((digitalRead (bit1) == LOW) && (digitalRead (bit2) == HIGH))  { interval = 80;}
+          else if ((digitalRead (bit1) == HIGH) && (digitalRead (bit2) == HIGH)) { interval = 300;}
+          else{}
+            
+}
+
+void loop ()
+{               if (PTT != 0){
+                goTX();
+               }
+                else {
+                  goRX();
+                }
+} 
+
+// Interrupt Service Routine (ISR)
+void switchPressed ()
+{
+            if (digitalRead (BUTTON) == HIGH){
+             PTT = 1;
+            }
+            else  {
+              PTT = 0;          
+            }
+}  // end of switchPressed
+
+void goTX(){
+    digitalWrite(QRO_A, HIGH);
+    delay(interval);
+    digitalWrite(QRO_B, HIGH);
+    delay(interval);
+    digitalWrite(PtoRadio, HIGH);
+    digitalWrite(red, HIGH);
+}
+
+void goRX(){
+    digitalWrite(PtoRadio, LOW);
+    delay(interval/2);
+    digitalWrite(QRO_B, LOW);
+    delay(interval/2);
+    digitalWrite(QRO_A, LOW);
+    digitalWrite(red, LOW);
+}
+
+
+
