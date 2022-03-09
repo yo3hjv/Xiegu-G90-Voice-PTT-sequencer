@@ -3,12 +3,13 @@
  * Simple but efficient circuit to protect radio accessories from "hot switch".
  * Description of the circuit here:
  * https://yo3hjv.blogspot.com/2021/04/arduino-ptt-sequencer-for-xiegu-g90.html
- * Copyright 2021, april.
+ * Copyright 2021, April.
  * Adrian Florescu, YO3HJV
  */
 
 const byte PtoRadio = 5;
-const byte BUTTON = 2;
+const byte BUTTON = 3;  // This is where the PTT from the Microphone is connected. 
+                        // It is a ISR pin so only on pin 2 or pin 3 on Arduino NANO is possible
 const byte bit1 = 10;
 const byte bit2 = 11;
 const byte red = 9;
